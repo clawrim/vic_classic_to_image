@@ -17,7 +17,7 @@ int main(int argc, char **argv)
            error
            ("Usage: vic_soil2nc classic_global.txt image_global.txt domain.nc domain_type:nc_name,... params.nc histfreq:count,...\n");
          */
-        error("Usage: vic_soil2nc classic_global.txt image_prefix\n");
+        error("Usage: vic_classic_to_image classic_global.txt image_prefix\n");
 
     classic_gp_path = argv[i++];
     image_prefix = argv[i++];
