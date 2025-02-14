@@ -11,7 +11,7 @@
 
 enum calendar
 {
-    STANDARD,                   /* default */
+    STANDARD,
     GREGORIAN,
     PROLEPTIC_GREGORIAN,
     NOLEAP,
