@@ -58,6 +58,18 @@ struct veg_params_s *read_classic_veg_params(struct global_params_s *gp)
         cell->root_depth = malloc(sizeof *cell->root_depth * cell->Nveg);
         cell->root_fract = malloc(sizeof *cell->root_fract * cell->Nveg);
 
+        if (gp->blowing) {
+            cell->sigma_slope =
+                malloc(sizeof *cell->sigma_slope * cell->Nveg);
+            cell->lag_one = malloc(sizeof *cell->lag_one * cell->Nveg);
+            cell->fetch = malloc(sizeof *cell->fetch * cell->Nveg);
+        }
+        else {
+            cell->sigma_slope = NULL;
+            cell->lag_one = NULL;
+            cell->fetch = NULL;
+        }
+
         if (gp->vegparam_lai)
             cell->LAI = malloc(sizeof *cell->LAI * cell->Nveg);
         else
@@ -101,8 +113,8 @@ struct veg_params_s *read_classic_veg_params(struct global_params_s *gp)
                 cell->root_depth[i] = cell->root_fract[i] = NULL;
 
             if (gp->blowing)
-                sscanf(p1, "%lf %lf %lf", &cell->sigma_slope, &cell->lag_one,
-                       &cell->fetch);
+                sscanf(p1, "%lf %lf %lf", &cell->sigma_slope[i],
+                       &cell->lag_one[i], &cell->fetch[i]);
 
             if (gp->vegparam_lai) {
                 if (!fgets(p1, BUF_SIZE, fp))

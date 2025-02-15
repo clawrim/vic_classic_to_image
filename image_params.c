@@ -31,7 +31,12 @@ void create_image_params(struct global_params_s *gp, struct soil_s *soil,
         July_Tavg_varid;
     /* vegetation variables */
     int Nveg_varid, Cv_varid, root_depth_varid, root_fract_varid,
-	overstory_varid, rarc_varid, rmin_varid;
+        sigma_slope_varid, lag_one_varid, fetch_varid, LAI_varid,
+        FCANOPY_varid, ALBEDO_varid, overstory_varid, rarc_varid, rmin_varid,
+        veg_rough_varid, displacement_varid, wind_h_varid, RGL_varid,
+        rad_atten_varid, wind_atten_varid, trunk_ratio_varid, Ctype_varid,
+        MaxCarboxRate_varid, MaxETransport_varid, LightUseEff_varid,
+        NscaleFlag_varid, Wnpp_inhib_varid, NPPfactor_sat_varid;
     int dimids[4];
     int *ints, nints;
     size_t start[4], count[4];
@@ -130,9 +135,11 @@ void create_image_params(struct global_params_s *gp, struct soil_s *soil,
     nc_check(nc_def_var
              (ncid, "gridcell", NC_INT, d - 1, dimids + 1, &gridcell_varid),
              "Cannot define variable: gridcell\n");
-    nc_check(nc_def_var(ncid, "lats", NC_DOUBLE, d - 1, dimids + 1, &lats_varid),
+    nc_check(nc_def_var
+             (ncid, "lats", NC_DOUBLE, d - 1, dimids + 1, &lats_varid),
              "Cannot define variable: lats\n");
-    nc_check(nc_def_var(ncid, "lons", NC_DOUBLE, d - 1, dimids + 1, &lons_varid),
+    nc_check(nc_def_var
+             (ncid, "lons", NC_DOUBLE, d - 1, dimids + 1, &lons_varid),
              "Cannot define variable: lons\n");
     nc_check(nc_def_var
              (ncid, "infilt", NC_DOUBLE, d - 1, dimids + 1, &infilt_varid),
@@ -157,7 +164,8 @@ void create_image_params(struct global_params_s *gp, struct soil_s *soil,
              (ncid, "init_moist", NC_DOUBLE, d, dimids, &init_moist_varid),
              "Cannot define variable: init_moist\n");
 
-    nc_check(nc_def_var(ncid, "elev", NC_DOUBLE, d - 1, dimids + 1, &elev_varid),
+    nc_check(nc_def_var
+             (ncid, "elev", NC_DOUBLE, d - 1, dimids + 1, &elev_varid),
              "Cannot define variable: elev\n");
 
     nc_check(nc_def_var(ncid, "depth", NC_DOUBLE, d, dimids, &depth_varid),
@@ -229,8 +237,8 @@ void create_image_params(struct global_params_s *gp, struct soil_s *soil,
                   &frost_slope_varid),
                  "Cannot define variable: frost_slope\n");
         nc_check(nc_def_var
-                 (ncid, "max_snow_distrib_slope", NC_DOUBLE, d - 1, dimids + 1,
-                  &max_snow_distrib_slope_varid),
+                 (ncid, "max_snow_distrib_slope", NC_DOUBLE, d - 1,
+                  dimids + 1, &max_snow_distrib_slope_varid),
                  "Cannot define variable: max_snow_distrib_slope\n");
     }
 
@@ -247,23 +255,51 @@ void create_image_params(struct global_params_s *gp, struct soil_s *soil,
     dimids[d++] = veg_class_dimid;
     dimids[d++] = lat_dimid;
     dimids[d++] = lon_dimid;
-    nc_check(nc_def_var(ncid, "Cv", NC_DOUBLE, d, dimids, &Cv_varid), "Cannot define variable: Cv\n");
+    nc_check(nc_def_var(ncid, "Cv", NC_DOUBLE, d, dimids, &Cv_varid),
+             "Cannot define variable: Cv\n");
 
     d = 0;
     dimids[d++] = veg_class_dimid;
     dimids[d++] = root_zone_dimid;
     dimids[d++] = lat_dimid;
     dimids[d++] = lon_dimid;
-    nc_check(nc_def_var(ncid, "root_depth", NC_DOUBLE, d, dimids, &root_depth_varid), "Cannot define variable: root_depth\n");
-    nc_check(nc_def_var(ncid, "root_fract", NC_DOUBLE, d, dimids, &root_fract_varid), "Cannot define variable: root_fract\n");
+    nc_check(nc_def_var
+             (ncid, "root_depth", NC_DOUBLE, d, dimids, &root_depth_varid),
+             "Cannot define variable: root_depth\n");
+    nc_check(nc_def_var
+             (ncid, "root_fract", NC_DOUBLE, d, dimids, &root_fract_varid),
+             "Cannot define variable: root_fract\n");
+
+    if (gp->blowing) {
+        d = 0;
+        dimids[d++] = veg_class_dimid;
+        dimids[d++] = lat_dimid;
+        dimids[d++] = lon_dimid;
+        nc_check(nc_def_var
+                 (ncid, "sigma_slope", NC_DOUBLE, d, dimids,
+                  &sigma_slope_varid),
+                 "Cannot define variable: sigma_slope\n");
+        nc_check(nc_def_var
+                 (ncid, "lag_one", NC_DOUBLE, d, dimids, &lag_one_varid),
+                 "Cannot define variable: lag_one\n");
+        nc_check(nc_def_var
+                 (ncid, "fetch", NC_DOUBLE, d, dimids, &fetch_varid),
+                 "Cannot define variable: fetch\n");
+    }
 
     d = 0;
     dimids[d++] = veg_class_dimid;
+    dimids[d++] = month_dimid;
     dimids[d++] = lat_dimid;
     dimids[d++] = lon_dimid;
-    nc_check(nc_def_var(ncid, "overstory", NC_INT, d, dimids, &overstory_varid), "Cannot define variable: overstory\n");
-    nc_check(nc_def_var(ncid, "rarc", NC_DOUBLE, d, dimids, &rarc_varid), "Cannot define variable: rarc\n");
-    nc_check(nc_def_var(ncid, "rmin", NC_DOUBLE, d, dimids, &rmin_varid), "Cannot define variable: rmin\n");
+    nc_check(nc_def_var(ncid, "LAI", NC_DOUBLE, d, dimids, &LAI_varid),
+             "Cannot define variable: LAI\n");
+    if (gp->vegparam_fcan || gp->veglib_fcan)
+        nc_check(nc_def_var
+                 (ncid, "FCANOPY", NC_DOUBLE, d, dimids, &FCANOPY_varid),
+                 "Cannot define variable: FCANOPY\n");
+    nc_check(nc_def_var(ncid, "ALBEDO", NC_DOUBLE, d, dimids, &ALBEDO_varid),
+             "Cannot define variable: ALBEDO\n");
 
     d = 0;
     dimids[d++] = veg_class_dimid;
@@ -271,6 +307,74 @@ void create_image_params(struct global_params_s *gp, struct soil_s *soil,
     nc_check(nc_def_var
              (ncid, "veg_descr", NC_CHAR, d, dimids, &veg_descr_varid),
              "Cannot define variable: veg_descr\n");
+
+    d = 0;
+    dimids[d++] = veg_class_dimid;
+    dimids[d++] = lat_dimid;
+    dimids[d++] = lon_dimid;
+    nc_check(nc_def_var
+             (ncid, "overstory", NC_INT, d, dimids, &overstory_varid),
+             "Cannot define variable: overstory\n");
+    nc_check(nc_def_var(ncid, "rarc", NC_DOUBLE, d, dimids, &rarc_varid),
+             "Cannot define variable: rarc\n");
+    nc_check(nc_def_var(ncid, "rmin", NC_DOUBLE, d, dimids, &rmin_varid),
+             "Cannot define variable: rmin\n");
+
+    d = 0;
+    dimids[d++] = veg_class_dimid;
+    dimids[d++] = month_dimid;
+    dimids[d++] = lat_dimid;
+    dimids[d++] = lon_dimid;
+    nc_check(nc_def_var
+             (ncid, "veg_rough", NC_DOUBLE, d, dimids, &veg_rough_varid),
+             "Cannot define variable: veg_rough\n");
+    nc_check(nc_def_var
+             (ncid, "displacement", NC_DOUBLE, d, dimids,
+              &displacement_varid), "Cannot define variable: displacement\n");
+
+    d = 0;
+    dimids[d++] = veg_class_dimid;
+    dimids[d++] = lat_dimid;
+    dimids[d++] = lon_dimid;
+    nc_check(nc_def_var(ncid, "wind_h", NC_DOUBLE, d, dimids, &wind_h_varid),
+             "Cannot define variable: wind_h\n");
+    nc_check(nc_def_var(ncid, "RGL", NC_DOUBLE, d, dimids, &RGL_varid),
+             "Cannot define variable: RGL\n");
+    nc_check(nc_def_var
+             (ncid, "rad_atten", NC_DOUBLE, d, dimids, &rad_atten_varid),
+             "Cannot define variable: rad_atten\n");
+    nc_check(nc_def_var
+             (ncid, "wind_atten", NC_DOUBLE, d, dimids, &wind_atten_varid),
+             "Cannot define variable: wind_atten\n");
+    nc_check(nc_def_var
+             (ncid, "trunk_ratio", NC_DOUBLE, d, dimids, &trunk_ratio_varid),
+             "Cannot define variable: trunk_ratio\n");
+    if (gp->veglib_photo) {
+        nc_check(nc_def_var(ncid, "Ctype", NC_INT, d, dimids, &Ctype_varid),
+                 "Cannot define variable: Ctype\n");
+        nc_check(nc_def_var
+                 (ncid, "MaxCarboxRate", NC_DOUBLE, d, dimids,
+                  &MaxCarboxRate_varid),
+                 "Cannot define variable: MaxCarboxRate\n");
+        nc_check(nc_def_var
+                 (ncid, "MaxETransport", NC_DOUBLE, d, dimids,
+                  &MaxETransport_varid),
+                 "Cannot define variable: MaxETransport\n");
+        nc_check(nc_def_var
+                 (ncid, "LightUseEff", NC_DOUBLE, d, dimids,
+                  &LightUseEff_varid),
+                 "Cannot define variable: LightUseEff\n");
+        nc_check(nc_def_var
+                 (ncid, "NscaleFlag", NC_INT, d, dimids, &NscaleFlag_varid),
+                 "Cannot define variable: NscaleFlag\n");
+        nc_check(nc_def_var
+                 (ncid, "Wnpp_inhib", NC_DOUBLE, d, dimids,
+                  &Wnpp_inhib_varid), "Cannot define variable: Wnpp_inhib\n");
+        nc_check(nc_def_var
+                 (ncid, "NPPfactor_sat", NC_DOUBLE, d, dimids,
+                  &NPPfactor_sat_varid),
+                 "Cannot define variable: NPPfactor_sat\n");
+    }
 
     nc_check(nc_enddef(ncid), "Cannot end definition\n");
 
@@ -313,15 +417,15 @@ void create_image_params(struct global_params_s *gp, struct soil_s *soil,
         int run_cell = soil->cells[i]->run_cell, fs_active =
             soil->cells[i]->fs_active;
         int lat_idx, lon_idx, mask_idx, vp_idx;
-	int j;
+        int j;
 
-	d = 0;
+        d = 0;
         start[d++] = 0;
         start[d++] = lat_idx =
             find_double(soil->domain->lat, soil->cells[i]->lat);
         start[d++] = lon_idx =
             find_double(soil->domain->lon, soil->cells[i]->lon);
-	d = 0;
+        d = 0;
         count[d++] = gp->nlayer;
         count[d++] = 1;
         count[d++] = 1;
@@ -469,49 +573,227 @@ void create_image_params(struct global_params_s *gp, struct soil_s *soil,
                       &soil->cells[i]->July_Tavg),
                      "Cannot put variable: July_Tavg\n");
 
-	/* vegetation variables */
-	for(vp_idx = 0; vp_idx < veg_params->n_cells && veg_params->cells[vp_idx]->gridcel != soil->cells[i]->gridcel; vp_idx++);
-	if(vp_idx == veg_params->n_cells)
-	    error("Cannot find vegetation parameters for grid cell %d\n", soil->cells[i]->gridcel);
+        /* vegetation variables */
+        for (vp_idx = 0;
+             vp_idx < veg_params->n_cells &&
+             veg_params->cells[vp_idx]->gridcel != soil->cells[i]->gridcel;
+             vp_idx++) ;
+        if (vp_idx == veg_params->n_cells)
+            error("Cannot find vegetation parameters for grid cell %d\n",
+                  soil->cells[i]->gridcel);
 
-        nc_check(nc_put_var1(ncid, Nveg_varid, start + 1, &veg_params->cells[vp_idx]->Nveg), "Cannot put variable: Nveg\n");
+        nc_check(nc_put_var1
+                 (ncid, Nveg_varid, start + 1,
+                  &veg_params->cells[vp_idx]->Nveg),
+                 "Cannot put variable: Nveg\n");
 
-	d = 0;
-        start[d++] = 0;
-        start[d++] = lat_idx;
-        start[d++] = lon_idx;
-	d = 0;
-        count[d++] = veg_params->cells[vp_idx]->Nveg;
-        count[d++] = 1;
-        count[d++] = 1;
-        nc_check(nc_put_vara(ncid, Cv_varid, start, count, veg_params->cells[vp_idx]->Cv), "Cannot put variable: Cv\n");
+        for (j = 0; j < veg_params->cells[vp_idx]->Nveg; j++) {
+            int vl_idx, overstory;
 
-	d = 1;
-	start[d++] = 0;
-	start[d++] = lat_idx;
-	start[d++] = lon_idx;
-	d = 0;
-	count[d++] = 1;
-	count[d++] = veg_params->root_zones;
-	count[d++] = 1;
-	count[d++] = 1;
+            for (vl_idx = 0;
+                 vl_idx < veg_lib->n_classes &&
+                 veg_lib->classes[vl_idx]->veg_class !=
+                 veg_params->cells[vp_idx]->veg_class[j]; vl_idx++) ;
 
-	for(j = 0 ; j < veg_params->cells[vp_idx]->Nveg; j++){
-	    start[0] = j;
-	    nc_check(nc_put_vara(ncid, root_depth_varid, start, count, veg_params->cells[vp_idx]->root_depth[j]), "Cannot put variable: root_depth\n");
-	    nc_check(nc_put_vara(ncid, root_fract_varid, start, count, veg_params->cells[vp_idx]->root_fract[j]), "Cannot put variable: root_fract\n");
-	}
+            if (vl_idx == veg_lib->n_classes)
+                error
+                    ("Cannot find vegetation library for grid cell %d vegetation class %d\n",
+                     soil->cells[i]->gridcel,
+                     veg_params->cells[vp_idx]->veg_class[j]);
+
+            d = 0;
+            start[d++] = vl_idx;
+            start[d++] = lat_idx;
+            start[d++] = lon_idx;
+
+            nc_check(nc_put_var1
+                     (ncid, Cv_varid, start,
+                      &veg_params->cells[vp_idx]->Cv[j]),
+                     "Cannot put variable: Cv\n");
+
+            d = 0;
+            start[d++] = vl_idx;
+            start[d++] = 0;
+            start[d++] = lat_idx;
+            start[d++] = lon_idx;
+            d = 0;
+            count[d++] = 1;
+            count[d++] = veg_params->root_zones;
+            count[d++] = 1;
+            count[d++] = 1;
+
+            nc_check(nc_put_vara
+                     (ncid, root_depth_varid, start, count,
+                      veg_params->cells[vp_idx]->root_depth[j]),
+                     "Cannot put variable: root_depth\n");
+            nc_check(nc_put_vara
+                     (ncid, root_fract_varid, start, count,
+                      veg_params->cells[vp_idx]->root_fract[j]),
+                     "Cannot put variable: root_fract\n");
+
+            if (gp->blowing) {
+                d = 0;
+                start[d++] = vl_idx;
+                start[d++] = lat_idx;
+                start[d++] = lon_idx;
+
+                nc_check(nc_put_var1
+                         (ncid, sigma_slope_varid, start,
+                          &veg_params->cells[vp_idx]->sigma_slope[j]),
+                         "Cannot put variable: sigma_slope\n");
+                nc_check(nc_put_var1
+                         (ncid, lag_one_varid, start,
+                          &veg_params->cells[vp_idx]->lag_one[j]),
+                         "Cannot put variable: lag_one\n");
+                nc_check(nc_put_var1
+                         (ncid, fetch_varid, start,
+                          &veg_params->cells[vp_idx]->fetch[j]),
+                         "Cannot put variable: fetch\n");
+            }
+
+            d = 0;
+            start[d++] = vl_idx;
+            start[d++] = 0;
+            start[d++] = lat_idx;
+            start[d++] = lon_idx;
+            d = 0;
+            count[d++] = 1;
+            count[d++] = 12;
+            count[d++] = 1;
+            count[d++] = 1;
+
+            if (gp->vegparam_lai)
+                nc_check(nc_put_vara
+                         (ncid, LAI_varid, start, count,
+                          veg_params->cells[vp_idx]->LAI[j]),
+                         "Cannot put variable: LAI\n");
+
+            if (gp->vegparam_fcan)
+                nc_check(nc_put_vara
+                         (ncid, FCANOPY_varid, start, count,
+                          veg_params->cells[vp_idx]->FCANOPY[j]),
+                         "Cannot put variable: FCANOPY\n");
+
+            if (gp->vegparam_alb)
+                nc_check(nc_put_vara
+                         (ncid, ALBEDO_varid, start, count,
+                          veg_params->cells[vp_idx]->ALBEDO[j]),
+                         "Cannot put variable: ALBEDO\n");
+
+
+            d = 0;
+            start[d++] = vl_idx;
+            start[d++] = lat_idx;
+            start[d++] = lon_idx;
+
+            overstory = veg_lib->classes[vl_idx]->overstory;
+            nc_check(nc_put_var1
+                     (ncid, overstory_varid, start, &overstory),
+                     "Cannot put variable: overstory\n");
+            nc_check(nc_put_var1
+                     (ncid, rarc_varid, start,
+                      &veg_lib->classes[vl_idx]->rarc),
+                     "Cannot put variable: rarc\n");
+            nc_check(nc_put_var1
+                     (ncid, rmin_varid, start,
+                      &veg_lib->classes[vl_idx]->rmin),
+                     "Cannot put variable: rmin\n");
+
+            d = 0;
+            start[d++] = vl_idx;
+            start[d++] = 0;
+            start[d++] = lat_idx;
+            start[d++] = lon_idx;
+            d = 0;
+            count[d++] = 1;
+            count[d++] = 12;
+            count[d++] = 1;
+            count[d++] = 1;
+
+            if (!gp->vegparam_lai)
+                nc_check(nc_put_vara
+                         (ncid, LAI_varid, start, count,
+                          veg_lib->classes[vl_idx]->LAI),
+                         "Cannot put variable: LAI\n");
+
+            if (gp->veglib_fcan)
+                nc_check(nc_put_vara
+                         (ncid, FCANOPY_varid, start, count,
+                          veg_lib->classes[vl_idx]->FCANOPY),
+                         "Cannot put variable: FCANOPY\n");
+
+            if (!gp->vegparam_alb)
+                nc_check(nc_put_vara
+                         (ncid, ALBEDO_varid, start, count,
+                          veg_lib->classes[vl_idx]->albedo),
+                         "Cannot put variable: ALBEDO\n");
+            nc_check(nc_put_vara
+                     (ncid, veg_rough_varid, start, count,
+                      veg_lib->classes[vl_idx]->rough),
+                     "Cannot put variable: veg_rough\n");
+            nc_check(nc_put_vara
+                     (ncid, displacement_varid, start, count,
+                      veg_lib->classes[vl_idx]->displacement),
+                     "Cannot put variable: displacement\n");
+
+            d = 0;
+            start[d++] = vl_idx;
+            start[d++] = lat_idx;
+            start[d++] = lon_idx;
+            nc_check(nc_put_var1
+                     (ncid, wind_h_varid, start,
+                      &veg_lib->classes[vl_idx]->wind_h),
+                     "Cannot put variable: wind_h\n");
+            nc_check(nc_put_var1
+                     (ncid, RGL_varid, start,
+                      &veg_lib->classes[vl_idx]->RGL),
+                     "Cannot put variable: RGL\n");
+            nc_check(nc_put_var1
+                     (ncid, rad_atten_varid, start,
+                      &veg_lib->classes[vl_idx]->rad_atten),
+                     "Cannot put variable: rad_atten\n");
+            nc_check(nc_put_var1
+                     (ncid, wind_atten_varid, start,
+                      &veg_lib->classes[vl_idx]->wind_atten),
+                     "Cannot put variable: wind_atten\n");
+            nc_check(nc_put_var1
+                     (ncid, trunk_ratio_varid, start,
+                      &veg_lib->classes[vl_idx]->trunk_ratio),
+                     "Cannot put variable: trunk_ratio\n");
+
+            if (gp->veglib_photo) {
+                int NscaleFlag = veg_lib->classes[vl_idx]->NscaleFlag;
+
+                nc_check(nc_put_var1
+                         (ncid, Ctype_varid, start,
+                          &veg_lib->classes[vl_idx]->Ctype),
+                         "Cannot put variable: Ctype\n");
+                nc_check(nc_put_var1
+                         (ncid, MaxCarboxRate_varid, start,
+                          &veg_lib->classes[vl_idx]->MaxCarboxRate),
+                         "Cannot put variable: MaxCarboxRate\n");
+                nc_check(nc_put_var1
+                         (ncid, MaxETransport_varid, start,
+                          &veg_lib->classes[vl_idx]->MaxETransport),
+                         "Cannot put variable: MaxETransport\n");
+                nc_check(nc_put_var1
+                         (ncid, LightUseEff_varid, start,
+                          &veg_lib->classes[vl_idx]->LightUseEff),
+                         "Cannot put variable: LightUseEff\n");
+                nc_check(nc_put_var1
+                         (ncid, NscaleFlag_varid, start, &NscaleFlag),
+                         "Cannot put variable: NscaleFlag\n");
+                nc_check(nc_put_var1
+                         (ncid, Wnpp_inhib_varid, start,
+                          &veg_lib->classes[vl_idx]->Wnpp_inhib),
+                         "Cannot put variable: Wnpp_inhib\n");
+                nc_check(nc_put_var1
+                         (ncid, NPPfactor_sat_varid, start,
+                          &veg_lib->classes[vl_idx]->NPPfactor_sat),
+                         "Cannot put variable: NPPfactor_sat\n");
+            }
+        }
     }
-
-#if 0
-    for (i = 0; i < veg_lib->n_classes; i++) {
-	int overstory = veg_lib->classes[i]->overstory;
-
-        nc_check(nc_put_var1(ncid, overstory_varid, start + 1, &soil->cells[i]->gridcel),
-                 "Cannot put variable: cellnum\n");
-
-    }
-#endif
 
     nc_check(nc_close(ncid), "Cannot close file: %s\n", gp->parameters);
 }

@@ -460,9 +460,9 @@ struct veg_cell_s
     double *Cv;
     double **root_depth;
     double **root_fract;
-    double sigma_slope;
-    double lag_one;
-    double fetch;
+    double *sigma_slope;
+    double *lag_one;
+    double *fetch;
     double **LAI;
     double **FCANOPY;
     double **ALBEDO;
