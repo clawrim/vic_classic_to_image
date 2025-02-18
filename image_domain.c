@@ -65,8 +65,7 @@ void create_image_domain(struct global_params_s *gp, struct domain_s *domain)
             nc_check(nc_def_var
                      (ncid, varnames[var], NC_INT, 2, dimids, &varids[var]),
                      "Cannot define variable: %s\n", varnames[var]);
-            nc_check(nc_put_att
-                     (ncid, varids[var], "_FillValue", NC_INT, 1, &int_fill),
+            nc_check(nc_def_var_fill(ncid, varids[var], NC_FILL, &int_fill),
                      "Cannot put attribute: %s\n", varnames[var]);
             break;
         case AREA:
@@ -74,10 +73,9 @@ void create_image_domain(struct global_params_s *gp, struct domain_s *domain)
                      (ncid, varnames[var], NC_DOUBLE, 2, dimids,
                       &varids[var]), "Cannot define variable: %s\n",
                      varnames[var]);
-            nc_check(nc_put_att
-                     (ncid, varids[var], "_FillValue", NC_DOUBLE, 1,
-                      &double_fill), "Cannot put attribute: %s\n",
-                     varnames[var]);
+            nc_check(nc_def_var_fill
+                     (ncid, varids[var], NC_FILL, &double_fill),
+                     "Cannot put attribute: %s\n", varnames[var]);
             nc_check(nc_put_att_text
                      (ncid, varids[var], "units", strlen(AREA_UNITS),
                       AREA_UNITS), "Cannot put attribute: %s\n",
@@ -88,10 +86,9 @@ void create_image_domain(struct global_params_s *gp, struct domain_s *domain)
                      (ncid, varnames[var], NC_DOUBLE, 2, dimids,
                       &varids[var]), "Cannot define variable: %s\n",
                      varnames[var]);
-            nc_check(nc_put_att
-                     (ncid, varids[var], "_FillValue", NC_DOUBLE, 1,
-                      &double_fill), "Cannot put attribute: %s\n",
-                     varnames[var]);
+            nc_check(nc_def_var_fill
+                     (ncid, varids[var], NC_FILL, &double_fill),
+                     "Cannot put attribute: %s\n", varnames[var]);
             break;
         case YDIM:
             nc_check(nc_def_var
