@@ -32,7 +32,7 @@ void create_image_params(struct global_params_s *gp, struct soil_s *soil,
     /* vegetation variables */
     int Nveg_varid, Cv_varid, root_depth_varid, root_fract_varid,
         sigma_slope_varid, lag_one_varid, fetch_varid, LAI_varid,
-        FCANOPY_varid, ALBEDO_varid, overstory_varid, rarc_varid, rmin_varid,
+        FCANOPY_varid, albedo_varid, overstory_varid, rarc_varid, rmin_varid,
         veg_rough_varid, displacement_varid, wind_h_varid, RGL_varid,
         rad_atten_varid, wind_atten_varid, trunk_ratio_varid, Ctype_varid,
         MaxCarboxRate_varid, MaxETransport_varid, LightUseEff_varid,
@@ -298,8 +298,8 @@ void create_image_params(struct global_params_s *gp, struct soil_s *soil,
         nc_check(nc_def_var
                  (ncid, "FCANOPY", NC_DOUBLE, d, dimids, &FCANOPY_varid),
                  "Cannot define variable: FCANOPY\n");
-    nc_check(nc_def_var(ncid, "ALBEDO", NC_DOUBLE, d, dimids, &ALBEDO_varid),
-             "Cannot define variable: ALBEDO\n");
+    nc_check(nc_def_var(ncid, "albedo", NC_DOUBLE, d, dimids, &albedo_varid),
+             "Cannot define variable: albedo\n");
 
     d = 0;
     dimids[d++] = veg_class_dimid;
@@ -676,9 +676,9 @@ void create_image_params(struct global_params_s *gp, struct soil_s *soil,
 
             if (gp->vegparam_alb)
                 nc_check(nc_put_vara
-                         (ncid, ALBEDO_varid, start, count,
+                         (ncid, albedo_varid, start, count,
                           veg_params->cells[vp_idx]->ALBEDO[j]),
-                         "Cannot put variable: ALBEDO\n");
+                         "Cannot put variable: albedo\n");
 
 
             d = 0;
@@ -724,9 +724,9 @@ void create_image_params(struct global_params_s *gp, struct soil_s *soil,
 
             if (!gp->vegparam_alb)
                 nc_check(nc_put_vara
-                         (ncid, ALBEDO_varid, start, count,
+                         (ncid, albedo_varid, start, count,
                           veg_lib->classes[vl_idx]->albedo),
-                         "Cannot put variable: ALBEDO\n");
+                         "Cannot put variable: albedo\n");
             nc_check(nc_put_vara
                      (ncid, veg_rough_varid, start, count,
                       veg_lib->classes[vl_idx]->rough),
