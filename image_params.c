@@ -43,7 +43,7 @@ void create_image_params(struct global_params_s *gp, struct soil_s *soil,
     int veg_descr_len;
     int d;
     int i;
-    double double_fill = NC_FILL_DOUBLE;
+    double double_fill = 0;
 
     /* dimensions */
     nc_check(nc_create(gp->parameters, NC_CLOBBER, &ncid),
