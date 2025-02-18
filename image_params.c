@@ -43,6 +43,7 @@ void create_image_params(struct global_params_s *gp, struct soil_s *soil,
     int veg_descr_len;
     int d;
     int i;
+    double double_fill = NC_FILL_DOUBLE;
 
     /* dimensions */
     nc_check(nc_create(gp->parameters, NC_CLOBBER, &ncid),
@@ -257,6 +258,9 @@ void create_image_params(struct global_params_s *gp, struct soil_s *soil,
     dimids[d++] = lon_dimid;
     nc_check(nc_def_var(ncid, "Cv", NC_DOUBLE, d, dimids, &Cv_varid),
              "Cannot define variable: Cv\n");
+    nc_check(nc_put_att
+             (ncid, Cv_varid, "_FillValue", NC_DOUBLE, 1, &double_fill),
+             "Cannot put attribute: Cv\n");
 
     d = 0;
     dimids[d++] = veg_class_dimid;
